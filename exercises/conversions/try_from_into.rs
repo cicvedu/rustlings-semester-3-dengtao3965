@@ -9,7 +9,7 @@
 // Execute `rustlings hint try_from_into` or use the `hint` watch subcommand for
 // a hint.
 
-use std::convert::{TryFrom, TryInto};
+use std::{convert::{TryFrom, TryInto}, fmt::Error};
 
 #[derive(Debug, PartialEq)]
 struct Color {
@@ -27,7 +27,7 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
+
 
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
@@ -41,6 +41,19 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        convert_to_color(tuple)
+    }
+}
+
+fn convert_to_color(tuple: (i16, i16, i16)) -> Result<Color, IntoColorError> {
+    if 0<=tuple.0 && tuple.0 <=255 && 0<=tuple.1 && tuple.1 <=255 && 0<=tuple.2 && tuple.2 <=255{
+        Ok(Color{
+            red : u8::try_from(tuple.0).unwrap(),
+            green : u8::try_from(tuple.1).unwrap(),
+            blue : u8::try_from(tuple.2).unwrap()
+        })
+    } else {
+        Err(IntoColorError::IntConversion)
     }
 }
 
@@ -48,6 +61,15 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+            if 0<=arr[0] && arr[0] <=255 && 0<=arr[1] && arr[1] <=255 && 0<=arr[2] && arr[2] <=255{
+                Ok(Color{
+                    red : u8::try_from(arr[0]).unwrap(),
+                    green : u8::try_from(arr[1]).unwrap(),
+                    blue : u8::try_from(arr[2]).unwrap()
+                })
+            } else {
+                Err(IntoColorError::IntConversion)
+            }
     }
 }
 
@@ -55,6 +77,19 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len()==3 {
+            if 0<=slice[0] && slice[0] <=255 && 0<=slice[1] && slice[1] <=255 && 0<=slice[2] && slice[2] <=255{
+                Ok(Color{
+                    red : u8::try_from(slice[0]).unwrap(),
+                    green : u8::try_from(slice[1]).unwrap(),
+                    blue : u8::try_from(slice[2]).unwrap()
+                })
+            } else {
+                Err(IntoColorError::IntConversion)
+            }
+        }else {
+            Err(IntoColorError::BadLen)
+        }
     }
 }
 
@@ -67,7 +102,7 @@ fn main() {
     let c2: Result<Color, _> = [183, 65, 14].try_into();
     println!("{:?}", c2);
 
-    let v = vec![183, 65, 14];
+    let v: Vec<i16> = vec![183, 65, 14];
     // With slice we should use `try_from` function
     let c3 = Color::try_from(&v[..]);
     println!("{:?}", c3);
